@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using Npgsql;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -32,7 +34,18 @@ namespace txt.import
         }
         public virtual void AddToDB(List<Result> data)
         {
+            var cs = "Server=localhost;Port=3306;Database=store;User Id=root;";
 
+            using var con = new MySqlConnection(cs);
+            con.Open();
+
+            var sql = "INSERT INTO `b_highvoltage` (`i_highvoltage_id`, `c_test_voltage`, `c_test_current`, `c_test_time`, `d_highvoltage`, `i_pass`, `c_serial`, `c_series`, `c_computer`) VALUES ('1', '123', '123', '123', '12312', '3213213', '213213', '21321', '3123123');";
+
+            using var cmd = new MySqlCommand(sql, con);
+
+            var version = cmd.ExecuteReader();
+
+            //Console.WriteLine($"PostgreSQL version: {version}");
         }
     }
 }

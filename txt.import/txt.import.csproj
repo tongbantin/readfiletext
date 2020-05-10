@@ -6,6 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MySql.Data" Version="8.0.20" />
+    <PackageReference Include="Npgsql" Version="4.1.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="6-1-2020_PASS.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
