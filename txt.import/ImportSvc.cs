@@ -18,7 +18,7 @@ namespace txt.import
         }
         public virtual List<Result> ReadFile()
         {
-            var lines = File.ReadAllLines("C:\\Users\\tongb\\Documents\\6-1-2020_PASS.txt");
+            var lines = File.ReadAllLines(Path.Combine(System.IO.Directory.GetParent(@"./").FullName, "6-1-2020_PASS.txt"));
             var list_reult = new List<Result>();
             foreach (var line in lines)
             {
