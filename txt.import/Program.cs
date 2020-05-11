@@ -8,6 +8,7 @@ namespace txt.import
         {
             ImportSvc svc = new ImportSvc();
             svc.Import();
+            Console.ReadKey();
         }
     }
 }
