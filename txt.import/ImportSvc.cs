@@ -16,9 +16,26 @@ namespace txt.import
         }
         public virtual void Import()
         {
-            var result = ReadFile();
+            CollectFileToProcess();
+            var result = GetAllFileDataList();
             var result2 = SubstringObj(result);
             AddToDB(result2);
+        }
+        public virtual List<Result> GetAllFileDataList()
+        {
+            var result = new List<Result>();
+            var cur = Path.Combine(Environment.CurrentDirectory, "Process");
+            var files = Directory.EnumerateFiles(cur, "*.*");
+            foreach (var item in files)
+            {
+                var res = ReadFile(item);
+                if (res!= null)
+                {
+                    result.AddRange(res);
+                }
+            }
+            //
+            return result;
         }
         public virtual List<Result> SubstringObj(List<Result> data)
         {
@@ -60,35 +77,85 @@ namespace txt.import
             }
             
         }
-        public virtual List<Result> ReadFile()
+        public virtual void CollectFileToProcess()
         {
-
-            //var FileName = "6-1-2020_PASS.txt";
-            var cur = System.IO.Directory.GetParent(@"./").FullName;
-            var path = Directory.GetParent(cur).FullName;
-            var lines = File.ReadAllLines(Path.Combine(path, "6-1-2020_PASS.txt"));
-            
-            var list_reult = new List<Result>();
-            foreach (var line in lines)
+            try
             {
-                var data = line.Split(',');
-                list_reult.Add(new Result()
+                var cur = System.IO.Directory.GetParent(@"./").FullName;
+                var path = Directory.GetParent(cur).FullName;
+                var files = Directory.EnumerateFiles(path, "*.*")
+                .Where(s => s.EndsWith(".txt"));
+                var appPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), "Process");
+                if (!Directory.Exists(appPath))
                 {
-                    //i_highvoltage_id = data[0],
-                    c_test_voltage = data[16],
-                    c_test_current = data[17],
-                    c_test_time = data[19],
-                    d_highvoltage = data[6],
-                    i_pass = data[1],
-                    c_series = data[0],
-                    c_computer = ""
-
-                });
+                    System.IO.Directory.CreateDirectory(appPath);
+                }
+                foreach (var item in files)
+                {
+                    var filename = Path.GetFileName(item);
+                    var name = Path.GetFileNameWithoutExtension(item);
+                    if (name.Contains("_PASS")|| name.Contains("_FAIL"))
+                    {
+                        System.IO.File.Move(item, Path.Combine(appPath, filename));
+                    }
+                }
+                
             }
+            catch (Exception ex)
+            {
 
-            System.IO.File.Move(path+"6-1-2020_PASS.txt",path+"6-1-2020_PASS_uploaded.txt");
+                throw;
+            }
+            
+        }
+        public virtual List<Result> ReadFile(string filepath)
+        {
+            try
+            {
+                //var FileName = "6-1-2020_PASS.txt";
+                //var cur = System.IO.Directory.GetParent(@"./").FullName;
+                //var path = Directory.GetParent(cur).FullName;
+                var filename = Path.GetFileName(filepath);
+                var lines = File.ReadAllLines(filepath);
+                
+                var list_reult = new List<Result>();
+                foreach (var line in lines)
+                {
+                    var data = line.Split(',');
+                    list_reult.Add(new Result()
+                    {
+                        //i_highvoltage_id = data[0],
+                        c_test_voltage = data[16],
+                        c_test_current = data[17],
+                        c_test_time = data[19],
+                        d_highvoltage = data[6],
+                        i_pass = data[1],
+                        c_series = data[0],
+                        c_computer = ""
 
-            return list_reult;
+                    });
+                }
+                var appPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), "Success");
+                if (!Directory.Exists(appPath))
+                {
+                    System.IO.Directory.CreateDirectory(appPath);
+                }
+                System.IO.File.Move(filepath, Path.Combine(appPath, filename));
+                return list_reult;
+            }
+            catch (Exception ex)
+            {
+                var appPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), "Failed");
+                var filename = Path.GetFileName(filepath);
+                if (!Directory.Exists(appPath))
+                {
+                    System.IO.Directory.CreateDirectory(appPath);
+                }
+                System.IO.File.Move(filepath, Path.Combine(appPath, filename));
+                throw;
+            }           
+
+            
         }
         public virtual void AddToDB(List<Result> data)
         {
