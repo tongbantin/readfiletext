@@ -122,18 +122,37 @@ namespace txt.import
                 foreach (var line in lines)
                 {
                     var data = line.Split(',');
-                    list_reult.Add(new Result()
+                    if (filename.Contains("_PASS"))
                     {
-                        //i_highvoltage_id = data[0],
-                        c_test_voltage = data[16],
-                        c_test_current = data[17],
-                        c_test_time = data[19],
-                        d_highvoltage = data[6],
-                        i_pass = data[1],
-                        c_series = data[0],
-                        c_computer = ""
+                        list_reult.Add(new Result()
+                        {
+                            //i_highvoltage_id = data[0],
+                            c_test_voltage = data[16],
+                            c_test_current = data[17],
+                            c_test_time = data[19],
+                            d_highvoltage = data[6],
+                            i_pass = data[1],
+                            c_series = data[0],
+                            c_computer = ""
 
-                    });
+                        });
+                    }
+                    else if (filename.Contains("_FAIL"))
+                    {
+                        list_reult.Add(new Result()
+                        {
+                            //i_highvoltage_id = data[0],
+                            c_test_voltage = "",
+                            c_test_current = "",
+                            c_test_time = "",
+                            d_highvoltage = data[7],
+                            i_pass = data[1],
+                            c_series = data[0],
+                            c_computer = ""
+
+                        });
+                    }
+                    
                 }
                 var appPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), "Success");
                 if (!Directory.Exists(appPath))
@@ -152,7 +171,7 @@ namespace txt.import
                     System.IO.Directory.CreateDirectory(appPath);
                 }
                 System.IO.File.Move(filepath, Path.Combine(appPath, filename));
-                throw;
+                return null;
             }           
 
             
@@ -161,6 +180,11 @@ namespace txt.import
         {
             try
             {
+                if (data == null)
+                {
+                    //Log
+                    return;
+                }
                 var cs = "Server=localhost;Port=3306;Database=store;User Id=root;";
 
                 using var con = new MySqlConnection(cs);
