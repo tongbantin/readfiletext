@@ -244,9 +244,10 @@ namespace txt.import
                 return true;
 
             }
-            else {
+            else 
+            {
                 return false;
-                    }
+            }
         }
         }
 }
