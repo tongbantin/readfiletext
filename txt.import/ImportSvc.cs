@@ -32,7 +32,12 @@ namespace txt.import
                     var name = Path.GetFileNameWithoutExtension(item);
                     if (name.Contains("_PASS") || name.Contains("_FAIL"))
                     {
-                        MoveFile(item, "Process");
+                        var is_dup=check_is_exists(item, "Success");
+                        if (!is_dup)
+                        {
+                            MoveFile(item, "Process",true);
+                        }
+                        
                     }
                 }
 
@@ -200,7 +205,7 @@ namespace txt.import
             }
 
         }
-        public virtual void MoveFile(string file,string destination) {
+        public virtual void MoveFile(string file,string destination,bool is_copy =false) {
             var appPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), destination);
             if (!Directory.Exists(appPath))
             {
@@ -210,12 +215,38 @@ namespace txt.import
             var filenamewithoutext = Path.GetFileNameWithoutExtension(file);
             var ext = Path.GetExtension(file);
 
-            if (File.Exists(Path.Combine(appPath, filename)))
+            if (check_is_exists(file,destination))
             {
                 filename = String.Format("{0}_{1}{2}", filenamewithoutext, DateTime.Now.ToFileTime(), ext);
 
             }
-            System.IO.File.Move(file, Path.Combine(appPath, filename));
+            if (is_copy)
+            {
+                System.IO.File.Copy(file, Path.Combine(appPath, filename));
+            }
+            else {
+                System.IO.File.Move(file, Path.Combine(appPath, filename));
+            }
+
+            
         }
-    }
+        
+        public virtual bool check_is_exists(string file, string destination)
+        {
+            var appPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), destination);
+            if (!Directory.Exists(appPath))
+            {
+                System.IO.Directory.CreateDirectory(appPath);
+            }
+            var filename = Path.GetFileName(file);
+            if (File.Exists(Path.Combine(appPath, filename)))
+            {
+                return true;
+
+            }
+            else {
+                return false;
+                    }
+        }
+        }
 }
